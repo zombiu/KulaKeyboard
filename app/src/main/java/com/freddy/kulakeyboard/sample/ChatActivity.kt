@@ -42,7 +42,7 @@ class ChatActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     private fun init() {
         msgList = arrayListOf()
-        for (i in 0 until 20) {
+        for (i in 0 until 40) {
             msgList.add("Msg${i + 1}")
         }
         keyboardHelper = KeyboardHelper()

@@ -147,6 +147,7 @@ class KeyboardHelper {
             }
         })
         panel.setOnLayoutAnimatorHandleListener { panelType, lastPanelType, fromValue, toValue ->
+            // 动画触发流程：点击输入框或者表情按钮-> 输入面板接收到触摸事件 -> 回调给bindInputPanel
             handlePanelMoveAnimator(panelType, lastPanelType, fromValue, toValue)
         }
         return this
@@ -170,14 +171,21 @@ class KeyboardHelper {
     }
 
     @SuppressLint("ObjectAnimatorBinding")
-    private fun handlePanelMoveAnimator(panelType: PanelType, lastPanelType: PanelType, fromValue: Float, toValue: Float) {
+    private fun handlePanelMoveAnimator(
+        panelType: PanelType,
+        lastPanelType: PanelType,
+        fromValue: Float,
+        toValue: Float
+    ) {
         Log.d("KulaKeyboardHelper", "panelType = $panelType, lastPanelType = $lastPanelType")
+        // 创建recylcerView平移动画
         val recyclerViewTranslationYAnimator: ObjectAnimator =
             ObjectAnimator.ofFloat(recyclerView, "translationY", fromValue, toValue)
+        // 创建 输入面板 平移动画
         val inputPanelTranslationYAnimator: ObjectAnimator =
             ObjectAnimator.ofFloat(inputPanel, "translationY", fromValue, toValue)
         var panelTranslationYAnimator: ObjectAnimator? = null
-        when(panelType) {
+        when (panelType) {
             PanelType.INPUT_MOTHOD -> {
                 expressionPanel?.reset()
                 morePanel?.reset()
@@ -188,27 +196,33 @@ class KeyboardHelper {
             }
             PanelType.EXPRESSION -> {
                 morePanel?.reset()
-                panelTranslationYAnimator = ObjectAnimator.ofFloat(expressionPanel, "translationY", fromValue, toValue)
+                panelTranslationYAnimator =
+                    ObjectAnimator.ofFloat(expressionPanel, "translationY", fromValue, toValue)
             }
             PanelType.MORE -> {
                 expressionPanel?.reset()
-                panelTranslationYAnimator = ObjectAnimator.ofFloat(morePanel, "translationY", fromValue, toValue)
+                panelTranslationYAnimator =
+                    ObjectAnimator.ofFloat(morePanel, "translationY", fromValue, toValue)
             }
-            else -> {}
+            else -> {
+            }
         }
         val animatorSet = AnimatorSet()
         animatorSet.duration = 250
         animatorSet.interpolator = DecelerateInterpolator()
-        if(panelTranslationYAnimator == null) {
-            if(scrollBodyLayout) {
-                animatorSet.play(inputPanelTranslationYAnimator).with(recyclerViewTranslationYAnimator)
-            }else {
+        if (panelTranslationYAnimator == null) {
+            if (scrollBodyLayout) {
+                // 播放 底部输入面板 和 recyclerView 平移动画
+                animatorSet.play(inputPanelTranslationYAnimator)
+                    .with(recyclerViewTranslationYAnimator)
+            } else {
                 animatorSet.play(inputPanelTranslationYAnimator)
             }
-        }else {
-            if(scrollBodyLayout) {
-                animatorSet.play(inputPanelTranslationYAnimator).with(recyclerViewTranslationYAnimator).with(panelTranslationYAnimator)
-            }else {
+        } else {
+            if (scrollBodyLayout) {
+                animatorSet.play(inputPanelTranslationYAnimator)
+                    .with(recyclerViewTranslationYAnimator).with(panelTranslationYAnimator)
+            } else {
                 animatorSet.play(inputPanelTranslationYAnimator).with(panelTranslationYAnimator)
             }
         }

@@ -69,6 +69,7 @@ class CInputPanel : LinearLayout, IInputPanel {
         gravity = Gravity.BOTTOM
         setBackgroundColor(ContextCompat.getColor(context, R.color.c_cbcbcb))
         et_content.inputType = InputType.TYPE_NULL
+        // 给输入框设置 触摸监听，up时，执行向上的平移动画
         et_content.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 if (!isKeyboardOpened) {
@@ -80,6 +81,7 @@ class CInputPanel : LinearLayout, IInputPanel {
                     et_content.resetInputType()
                     btn_expression.setNormalImageResId(R.drawable.ic_chat_expression_normal)
                     btn_expression.setPressedImageResId(R.drawable.ic_chat_expression_pressed)
+                    // 弹出软键盘时，展示列表和输入框的动画
                     handleAnimator(PanelType.INPUT_MOTHOD)
                     onInputPanelStateChangedListener?.onShowInputMethodPanel()
                 }
@@ -154,6 +156,7 @@ class CInputPanel : LinearLayout, IInputPanel {
         }
     }
 
+    // 某些操作 会触发动画 比如 点击输入框
     private fun handleAnimator(panelType: PanelType) {
         Log.d(TAG, "lastPanelType = $lastPanelType\tpanelType = $panelType")
         if (lastPanelType == panelType) {
@@ -202,8 +205,11 @@ class CInputPanel : LinearLayout, IInputPanel {
                         toValue = -KeyboardHelper.inputPanelHeight.toFloat()
                     }
                     PanelType.NONE -> {
+                        // 从PanelType.NONE -> PanelType.INPUT_MOTHOD, 如果想定制输入框的弹起距离，可以在这里进行控制
                         fromValue = 0.0f
-                        toValue = -KeyboardHelper.inputPanelHeight.toFloat()
+//                        toValue = -KeyboardHelper.inputPanelHeight.toFloat()
+                        // todo 项目需求 比软键盘弹起的高度少50个dp
+                        toValue = -KeyboardHelper.inputPanelHeight.toFloat() + DensityUtil.dp2px(App.instance,50f)
                     }
                     else -> {
                     }
@@ -271,6 +277,7 @@ class CInputPanel : LinearLayout, IInputPanel {
                     }
                 }
         }
+        // 动画触发流程：点击输入框或者表情按钮-> 输入面板接收到触摸事件 -> 回调给bindInputPanel
         onLayoutAnimatorHandleListener?.invoke(panelType, lastPanelType, fromValue, toValue)
         lastPanelType = panelType
     }

@@ -43,8 +43,10 @@ class KeyboardStatePopupWindow(var context: Context, anchorView: View) : PopupWi
     private var isSoftKeyboardOpened = false
 
     override fun onGlobalLayout() {
+        // 第一次绘制时，是占满全部的，此时记录下整个屏幕的高度
         val rect = Rect()
         contentView.getWindowVisibleDisplayFrame(rect)
+        // 当弹出软键盘时，rect.bottom就是弹出后，布局被压缩之后显示区域的高度
         if (rect.bottom > maxHeight) {
             maxHeight = rect.bottom
         }
